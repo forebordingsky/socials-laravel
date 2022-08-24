@@ -4,10 +4,10 @@
             <h1 class="text-xl mr-3">Socials</h1>
             <nav class="flex gap-2 items-baseline">
                 <a class="text-sm hover:text-base transition-all" href="{{ route('user.profiles') }}">Profiles</a>
-                {{-- @auth
-                    <a class="text-sm hover:text-base transition-all" href="{{ route('user.profile',auth()->user()) }}">My profile</a>
-                    <a class="text-sm hover:text-base transition-all" href="{{ route('user.comments',auth()->user()) }}">My comments</a>
-                @endauth --}}
+                @auth
+                    <a class="text-sm hover:text-base transition-all" href="{{ route('user.profile',auth()->user()->id) }}">My profile</a>
+                    <a class="text-sm hover:text-base transition-all" href="{{ route('user.comments',auth()->user()->id) }}">My comments</a>
+                @endauth
             </nav>
 
         </div>

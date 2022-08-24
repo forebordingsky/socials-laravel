@@ -39,7 +39,7 @@ Route::name('user.')->group(function () {
     Route::get('/profile/{user:id}',[CommentController::class,'profilePage'])->name('profile');
 
     Route::middleware('auth')->prefix('profile')->group(function () {
-        Route::get('/{user:name}/comments',[CommentController::class,'getUserComments'])->name('comments');
+        Route::get('/{user:id}/comments',[CommentController::class,'getUserComments'])->name('comments');
         Route::post('/add-comment',[CommentController::class,'addComment'])->name('comment.add');
         Route::post('/delete-comment',[CommentController::class,'deleteComment'])->name('comment.delete');
 

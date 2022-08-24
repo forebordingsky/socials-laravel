@@ -51,6 +51,11 @@ class User extends Authenticatable
         return $this->hasMany(Comment::class,'user_id')->where('parent_id',null)->with('user','replies')->orderBy('updated_at','desc');
     }
 
+    public function onlyComments()
+    {
+        return $this->hasMany(Comment::class,'user_id')->orderBy('updated_at','desc');
+    }
+
     public function latestComments()
     {
         return $this->comments()->limit(5);

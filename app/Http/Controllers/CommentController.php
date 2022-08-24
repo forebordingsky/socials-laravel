@@ -20,16 +20,15 @@ class CommentController extends Controller
     public function profilePage(User $user)
     {
         $user->load('latestComments')->loadCount('comments');
-        //$user->load('lastComments.replies')->orderBy('updated_at','desc');
         return view('profile',compact('user'));
     }
 
     public function getUserComments(User $user)
     {
-        if (!Gate::allows('access_comments',$user)) {
+        if (!Gate::allows('own_profile',$user)) {
             abort(403);
         }
-        $user = $user->load('comments');
+        $user = $user->load('onlyComments');
         return view('comments',compact('user'));
     }
 

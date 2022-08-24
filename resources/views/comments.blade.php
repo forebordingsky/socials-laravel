@@ -1,12 +1,12 @@
 <x-layout>
     <div class="mt-2 mb-3">
-        <h2 class="text-xl">{{ $user->username }}'s comments page</h2>
+        <h2 class="text-xl">{{ $user->email }}'s comments page</h2>
         <hr>
     </div>
     <h3 class="text-xl">Comments</h3>
     <section>
-        @if (count($user->comments))
-            @foreach ($user->comments as $comment)
+        @if (count($user->onlyComments))
+            @foreach ($user->onlyComments as $comment)
                 <div class="mb-2">
                     <div class="border rounded shadow-md">
                         <div class="border-b">
