@@ -15,8 +15,7 @@ class CommentRequest extends FormRequest
     {
         return [
             'header' => 'required|regex:/^[\pL\s\d\-]+$/u|min:3',
-            'description' => 'required|regex:/^[\pL\s\d\-]+$/u|min:3',
-            'answered_comment_id' => 'nullable'
+            'description' => 'required|regex:/^[\pL\s\d\-]+$/u|min:3'
         ];
     }
 

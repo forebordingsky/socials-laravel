@@ -3,7 +3,6 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\CommentController;
-use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -28,7 +27,6 @@ Route::name('auth.')->group(function () {
             Route::post('/register',[AuthController::class,'registerUser'])->name('handler');
         });
     });
-
     Route::middleware('auth')->group(function () {
         Route::post('/logout',[AuthController::class,'logoutUser'])->name('logout');
     });
@@ -39,15 +37,38 @@ Route::name('user.')->group(function () {
     Route::get('/profile/{user:id}',[CommentController::class,'profilePage'])->name('profile');
 
     Route::middleware('auth')->prefix('profile')->group(function () {
-        Route::get('/{user:id}/comments',[CommentController::class,'getUserComments'])->name('comments');
-        Route::post('/add-comment',[CommentController::class,'addComment'])->name('comment.add');
-        Route::post('/delete-comment',[CommentController::class,'deleteComment'])->name('comment.delete');
 
-        Route::get('/{user:id}/books',[BookController::class,'index'])->name('books');
-        Route::get('/{user:id}/book/create',[BookController::class,'create'])->name('book.create');
-        Route::post('/{user:id}/book/store',[BookController::class,'create'])->name('book.store');
-        Route::get('/{user:id}/book/{book:id}',[BookController::class,'show'])->name('book.show');
-        Route::put('/{user:id}/book/{book:id}',[BookController::class,'update'])->name('book.update');
-        Route::delete('/{user:id}/book/{book:id}',[BookController::class,'delete'])->name('book.delete');
+        Route::post('/{user:id}/add-comment',[CommentController::class,'addComment'])
+            ->name('comment.add')
+            ->middleware('can:add_comment,user');
+
+        Route::post('/{user:id}/reply-comment/{comment:id}',[CommentController::class,'replyComment'])
+            ->name('comment.reply')
+            ->middleware('can:reply_comment,user,comment');
+
+        Route::post('/{user:id}/delete-comment/{comment:id}',[CommentController::class,'deleteComment'])
+            ->name('comment.delete')
+            ->middleware('can:delete_comment,user,comment');
+
+        Route::post('/{user:id}/share-library/{owner}',[BookController::class,'shareLibrary'])
+            ->name('share');
+
+        Route::middleware('ownerpage')->group(function () {
+            Route::get('/{user:id}/comments',[CommentController::class,'getUserComments'])->name('comments');
+
+            Route::get('/{user:id}/book/create',[BookController::class,'create'])->name('book.create');
+            Route::post('/{user:id}/book/store',[BookController::class,'store'])->name('book.store');
+            Route::get('/{user:id}/book/{book:id}/edit',[BookController::class,'edit'])->name('book.edit');
+            Route::put('/{user:id}/book/{book:id}',[BookController::class,'update'])->name('book.update');
+            Route::delete('/{user:id}/book/{book:id}',[BookController::class,'destroy'])->name('book.delete');
+        });
+        Route::get('/{user:id}/books',[BookController::class,'index'])
+            ->name('books')
+            ->middleware('can:view_library,user');
+
+        Route::get('/{user:id}/book/{book:id}',[BookController::class,'show'])
+            ->name('book.show')
+            ->middleware('can:view_book,user,book');
+
     });
 });

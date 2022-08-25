@@ -1,18 +1,20 @@
 <script setup>
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
-    const props = defineProps(['commentId'])
+    const props = defineProps(['commentId','userId'])
     const csrfToken = ref();
     onMounted(() => {
         csrfToken.value = document.querySelector('meta[name="csrf-token"]').content
+    })
+    const replyCommentRoute = computed(() => {
+        return '/profile/' + props.userId + '/reply-comment/' + props.commentId
     })
 
 </script>
 
 <template>
-    <form action="/profile/add-comment" method="POST" class="border rounded py-2 px-3 ml-3">
+    <form :action="replyCommentRoute" method="POST" class="border rounded py-2 px-3 ml-3">
         <input type="hidden" :value="csrfToken" name="_token"/>
-        <input type="hidden" name="parent_id" value="{{ commentId }}"/>
         <div class="flex mb-2">
             <label>Header</label>
             <input class="ml-2 border-b w-full focus:border-b-2 focus:outline-none" type="text" name="header">

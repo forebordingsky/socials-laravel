@@ -48,30 +48,38 @@ class User extends Authenticatable
 
     public function comments()
     {
-        return $this->hasMany(Comment::class,'user_id')->where('parent_id',null)->with('user','replies')->orderBy('updated_at','desc');
+        return $this->hasMany(Comment::class,'user_id');
     }
 
-    public function onlyComments()
+    public function userComments()
     {
-        return $this->hasMany(Comment::class,'user_id')->orderBy('updated_at','desc');
+        return $this->comments()->where('parent_id',null)->with('user','replies')->orderBy('updated_at','desc');
     }
 
     public function latestComments()
     {
-        return $this->comments()->limit(5);
+        return $this->userComments()->limit(5);
     }
 
     public function lastComments()
     {
-        return $this->comments()->skip(5)->limit(PHP_INT_MAX);
+        return $this->userComments()->skip(5)->limit(PHP_INT_MAX);
     }
-    // public function comments()
-    // {
-    //     return $this->hasMany(Comment::class,'user_id','id')->where('answered_comment_id',null)->with('user','lastChildren')->orderBy('updated_at','desc');
-    // }
 
-    // public function lastComments()
-    // {
-    //     return $this->comments()->limit(5);
-    // }
+    public function books()
+    {
+        return $this->hasMany(Book::class,'user_id','id');
+    }
+
+    //Пользователи, которым пользователь предоставил доступ
+    public function sharedUsers()
+    {
+        return $this->belongsToMany(User::class,'shared_library','owner_id','user_id');
+    }
+
+    //Пользователи, которые предоставили доступ этому пользователю
+    public function usersShared()
+    {
+        return $this->belongsToMany(User::class,'shared_library','user_id','owner_id');
+    }
 }

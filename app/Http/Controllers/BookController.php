@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreBookRequest;
+use App\Http\Requests\UpdateBookRequest;
+use App\Models\Book;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
 
 class BookController extends Controller
 {
@@ -15,9 +17,8 @@ class BookController extends Controller
      */
     public function index(User $user)
     {
-        if (!Gate::allows('own_profile',$user)) {
-            abort(403);
-        }
+        $user->load('books');
+        return view('book.index',compact('user'));
     }
 
     /**
@@ -25,9 +26,9 @@ class BookController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(User $user)
     {
-        //
+        return view('book.create');
     }
 
     /**
@@ -36,9 +37,15 @@ class BookController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreBookRequest $request, User $user)
     {
-        //
+        $data = $request->validated();
+        $book = $user->books()->create([
+            'name' => $data['name'],
+            'content' => $data['content'],
+            'link_access' => (bool)$request->link_access
+        ]);
+        return redirect()->route('user.book.edit',[$user->id,$book->id]);
     }
 
     /**
@@ -47,9 +54,9 @@ class BookController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(User $user, Book $book)
     {
-        //
+        return view('book.show',compact('user','book'));
     }
 
     /**
@@ -58,9 +65,9 @@ class BookController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(User $user, Book $book)
     {
-        //
+        return view('book.edit',compact('user','book'));
     }
 
     /**
@@ -70,9 +77,15 @@ class BookController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(UpdateBookRequest $request, User $user, Book $book)
     {
-        //
+        $data = $request->validated();
+        $book->update([
+            'name' => $data['name'],
+            'content' => $data['content'],
+            'link_access' => (bool)$request->link_access
+        ]);
+        return redirect()->route('user.book.edit',[$user->id,$book->id]);
     }
 
     /**
@@ -81,8 +94,16 @@ class BookController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, User $user, Book $book)
     {
-        //
+        $book->delete();
+        return redirect()->route('user.books',$user->id);
     }
+
+    public function shareLibrary(Request $request, User $user, User $owner)
+    {
+        $owner->sharedUsers()->toggle($user);
+        return redirect()->back();
+    }
+
 }

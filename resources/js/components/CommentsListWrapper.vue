@@ -6,9 +6,10 @@ import { computed, provide, ref } from 'vue';
     const auth = props.auth
     const owned = props.owned
     const userId = props.userId
+    const profileId = props.profileId
     const commentsList = ref(props.comments)
     const loaded = ref(false)
-    provide('privileges',{auth, owned,userId})
+    provide('privileges',{auth, owned, userId, profileId})
 
     const listLenght = computed(() => {
         return commentsList.value.length
@@ -25,5 +26,5 @@ import { computed, provide, ref } from 'vue';
 
 <template>
     <comments-list-component :comments="commentsList"/>
-    <load-button-component v-if="!loaded && listLenght < count" @load="load"/>
+    <load-button-component v-if="!loaded && listLenght && listLenght < count" @load="load"/>
 </template>

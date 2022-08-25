@@ -7,6 +7,7 @@
                 @auth
                     <a class="text-sm hover:text-base transition-all" href="{{ route('user.profile',auth()->user()->id) }}">My profile</a>
                     <a class="text-sm hover:text-base transition-all" href="{{ route('user.comments',auth()->user()->id) }}">My comments</a>
+                    <a class="text-sm hover:text-base transition-all" href="{{ route('user.books',auth()->user()->id) }}">My books</a>
                 @endauth
             </nav>
 
