@@ -9,44 +9,65 @@ use Illuminate\Support\Facades\Request;
 
 class CommentController extends Controller
 {
-
-    public function getAllProfiles()
-    {
-        $users = User::all();
-        return view('home',compact('users'));
-    }
-
-    public function profilePage(User $user)
-    {
-        $user->load('latestComments')->loadCount('userComments');
-        return view('profile',compact('user'));
-    }
-
-    public function getUserComments(User $user)
+    /**
+     * Возвращает страницу пользователя со всеми его комментариями
+     *
+     * @param User $user
+     * @return void
+     */
+    public function all(User $user)
     {
         $comments = Comment::where('user_id',$user->id)->with('parent.user')->orderBy('updated_at','desc')->get();
         return view('comments',compact('user','comments'));
     }
 
-    public function addComment(CommentRequest $request, User $user)
+    /**
+     * Заносит в базу новый комментарий пользователя
+     *
+     * @param CommentRequest $request
+     * @param User $user
+     * @return void
+     */
+    public function add(CommentRequest $request, User $user)
     {
         $data = $request->validated();
-        $user->comments()->create($data);
+        $user->comments()->create([
+            'header' => $data['header'],
+            'description' => $data['description'],
+            'profile_user_id' => $user->id,
+            'user_id' => $user->id
+        ]);
         return back()->with('message', 'Success');
     }
 
-    public function replyComment(CommentRequest $request, User $user, Comment $comment)
+    /**
+     * Заносит в базу комментарий на комментарий другого пользователя
+     *
+     * @param CommentRequest $request
+     * @param Comment $comment
+     * @return void
+     */
+    public function reply(CommentRequest $request, User $user, Comment $comment)
     {
         $data = $request->validated();
+
         $comment->replies()->create([
             'header' => $data['header'],
             'description' => $data['description'],
+            'profile_user_id' => $user->id,
             'user_id' => auth()->user()->id
         ]);
         return back()->with('message', 'Success');
     }
 
-    public function deleteComment(Request $request, User $user, Comment $comment)
+    /**
+     * Изменяет статус на 'удален', если у комментария есть ответы. Иначе удаляет комментарий
+     *
+     * @param Request $request
+     * @param Comment $comment
+     * @return void
+     */
+    public function delete(Request $request, Comment $comment)
     {
         //Если есть дочерние комментарии, то не удаляем, а изменяем статус
         if (count($comment->replies)) {
@@ -63,7 +84,13 @@ class CommentController extends Controller
         return back()->with('message', 'Success');
     }
 
-    public function getAllCommentsJSON(User $user)
+    /**
+     * Возвращет остальные комментарии пользователя в JSON формате
+     *
+     * @param User $user
+     * @return void
+     */
+    public function getRestJSON(User $user)
     {
         $user->load('lastComments')->orderBy('updated_at','desc');
         return response()->json($user->lastComments);

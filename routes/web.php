@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -33,28 +34,29 @@ Route::name('auth.')->group(function () {
 });
 
 Route::name('user.')->group(function () {
-    Route::get('/',[CommentController::class,'getAllProfiles'])->name('profiles');
-    Route::get('/profile/{user:id}',[CommentController::class,'profilePage'])->name('profile');
+    Route::get('/',[UserController::class,'index'])->name('profiles');
+    Route::get('/profile/{user:id}',[UserController::class,'show'])->name('profile');
 
     Route::middleware('auth')->prefix('profile')->group(function () {
 
-        Route::post('/{user:id}/add-comment',[CommentController::class,'addComment'])
+        Route::post('/{user:id}/add-comment',[CommentController::class,'add'])
             ->name('comment.add')
-            ->middleware('can:add_comment,user');
+            ->middleware('can:comment,user');
 
-        Route::post('/{user:id}/reply-comment/{comment:id}',[CommentController::class,'replyComment'])
+        Route::post('{user:id}/reply-comment/{comment:id}',[CommentController::class,'reply'])
             ->name('comment.reply')
-            ->middleware('can:reply_comment,user,comment');
+            ->middleware('can:reply,comment');
 
-        Route::post('/{user:id}/delete-comment/{comment:id}',[CommentController::class,'deleteComment'])
+        Route::post('/delete-comment/{comment:id}',[CommentController::class,'delete'])
             ->name('comment.delete')
-            ->middleware('can:delete_comment,user,comment');
+            ->middleware('can:delete,comment');
 
-        Route::post('/{user:id}/share-library/{owner}',[BookController::class,'shareLibrary'])
+        Route::post('/{user:id}/share-library/{owner}',[UserController::class,'share'])
             ->name('share');
 
         Route::middleware('ownerpage')->group(function () {
-            Route::get('/{user:id}/comments',[CommentController::class,'getUserComments'])->name('comments');
+
+            Route::get('/{user:id}/comments',[CommentController::class,'all'])->name('comments');
 
             Route::get('/{user:id}/book/create',[BookController::class,'create'])->name('book.create');
             Route::post('/{user:id}/book/store',[BookController::class,'store'])->name('book.store');

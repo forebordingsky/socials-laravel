@@ -1,7 +1,5 @@
 <script setup>
-
     const props = defineProps(['comments','parent'])
-
 </script>
 
 <template>

@@ -21506,20 +21506,32 @@ __webpack_require__.r(__webpack_exports__);
     var expose = _ref.expose;
     expose();
     var props = __props;
-    var privileges = (0,vue__WEBPACK_IMPORTED_MODULE_0__.inject)('privileges');
-    var csrfToken = (0,vue__WEBPACK_IMPORTED_MODULE_0__.ref)();
+    var users = (0,vue__WEBPACK_IMPORTED_MODULE_0__.inject)('users');
     var showForm = (0,vue__WEBPACK_IMPORTED_MODULE_0__.ref)(false);
+    var csrfToken = (0,vue__WEBPACK_IMPORTED_MODULE_0__.ref)();
     (0,vue__WEBPACK_IMPORTED_MODULE_0__.onMounted)(function () {
       csrfToken.value = document.querySelector('meta[name="csrf-token"]').content;
     });
+    var canDelete = (0,vue__WEBPACK_IMPORTED_MODULE_0__.computed)(function () {
+      if (users.auth && !props.comment.deleted) {
+        return users.auth.id === props.comment.user_id || users.auth.id === props.comment.profile_user_id;
+      }
+
+      return false;
+    });
+    var canReply = (0,vue__WEBPACK_IMPORTED_MODULE_0__.computed)(function () {
+      return users.auth && users.auth.id !== props.comment.user_id;
+    });
     var deleteRoute = (0,vue__WEBPACK_IMPORTED_MODULE_0__.computed)(function () {
-      return '/profile/' + (props.comment.user ? props.comment.user.id : privileges.userId) + '/delete-comment/' + props.comment.id;
+      return '/profile/delete-comment/' + props.comment.id;
     });
     var __returned__ = {
       props: props,
-      privileges: privileges,
-      csrfToken: csrfToken,
+      users: users,
       showForm: showForm,
+      csrfToken: csrfToken,
+      canDelete: canDelete,
+      canReply: canReply,
       deleteRoute: deleteRoute,
       computed: vue__WEBPACK_IMPORTED_MODULE_0__.computed,
       inject: vue__WEBPACK_IMPORTED_MODULE_0__.inject,
@@ -21585,46 +21597,38 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   __name: 'CommentsListWrapper',
-  props: ['comments', 'count', 'auth', 'owned', 'profileId', 'userId'],
+  props: ['auth', 'user'],
   setup: function setup(__props, _ref) {
     var expose = _ref.expose;
     expose();
     var props = __props;
-    var auth = props.auth;
-    var owned = props.owned;
-    var userId = props.userId;
-    var profileId = props.profileId;
-    var commentsList = (0,vue__WEBPACK_IMPORTED_MODULE_1__.ref)(props.comments);
-    var loaded = (0,vue__WEBPACK_IMPORTED_MODULE_1__.ref)(false);
-    (0,vue__WEBPACK_IMPORTED_MODULE_1__.provide)('privileges', {
-      auth: auth,
-      owned: owned,
-      userId: userId,
-      profileId: profileId
-    });
-    var listLenght = (0,vue__WEBPACK_IMPORTED_MODULE_1__.computed)(function () {
-      return commentsList.value.length;
+    var comments = (0,vue__WEBPACK_IMPORTED_MODULE_1__.ref)(props.user.latest_comments);
+    var user = {
+      email: props.user.email,
+      id: props.user.id
+    };
+    (0,vue__WEBPACK_IMPORTED_MODULE_1__.provide)('users', {
+      auth: props.auth,
+      profile: user
     }); //Загружаем все оставшиеся комментарии и скрываем кнопку
 
     var load = function load() {
-      axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/profile/".concat(props.profileId, "/comments")).then(function (response) {
-        return commentsList.value = commentsList.value.concat(response.data);
+      axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/profile/".concat(user.id, "/comments")).then(function (response) {
+        return comments.value = comments.value.concat(response.data);
       })["catch"](function (error) {
         return console.log(error);
       });
-      loaded.value = !loaded.value;
     };
 
+    var canLoad = (0,vue__WEBPACK_IMPORTED_MODULE_1__.computed)(function () {
+      return comments.value.length < props.user.profile_comments_count;
+    });
     var __returned__ = {
       props: props,
-      auth: auth,
-      owned: owned,
-      userId: userId,
-      profileId: profileId,
-      commentsList: commentsList,
-      loaded: loaded,
-      listLenght: listLenght,
+      comments: comments,
+      user: user,
       load: load,
+      canLoad: canLoad,
       axios: (axios__WEBPACK_IMPORTED_MODULE_0___default()),
       computed: vue__WEBPACK_IMPORTED_MODULE_1__.computed,
       provide: vue__WEBPACK_IMPORTED_MODULE_1__.provide,
@@ -21655,7 +21659,7 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   __name: 'ReplyCommentForm',
-  props: ['commentId', 'userId'],
+  props: ['commentId', 'commentUserId'],
   setup: function setup(__props, _ref) {
     var expose = _ref.expose;
     expose();
@@ -21665,7 +21669,7 @@ __webpack_require__.r(__webpack_exports__);
       csrfToken.value = document.querySelector('meta[name="csrf-token"]').content;
     });
     var replyCommentRoute = (0,vue__WEBPACK_IMPORTED_MODULE_0__.computed)(function () {
-      return '/profile/' + props.userId + '/reply-comment/' + props.commentId;
+      return '/profile/' + props.commentUserId + '/reply-comment/' + props.commentId;
     });
     var __returned__ = {
       props: props,
@@ -21753,13 +21757,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [$props.parent ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_4, [_hoisted_5, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.parent.header), 1
   /* TEXT */
-  ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" by " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.parent.user.email) + ":", 1
+  ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" by " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.parent.user ? $props.parent.user.email : $setup.users.profile.email) + ":", 1
   /* TEXT */
   )])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h3", _hoisted_6, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.comment.header), 1
   /* TEXT */
-  ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_7, "by " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.comment.user.email), 1
+  ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_7, "by " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.comment.user ? $props.comment.user.email : $setup.users.profile.email), 1
   /* TEXT */
-  ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Проверяем может ли пользователь удалить комментарий (да, если это его страница или если это он написал комментарий) "), !$props.comment.deleted && ($setup.privileges.owned || $setup.privileges.userId == $props.comment.user_id) ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("form", {
+  ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Проверка комментарий был написан авторизованным пользователем или это ответ на комментарий авторизованного пользователя "), $setup.canDelete ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("form", {
     key: 1,
     action: $setup.deleteRoute,
     method: "POST",
@@ -21776,7 +21780,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   /* TEXT */
   )])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_14, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.comment.updated_at), 1
   /* TEXT */
-  ), $setup.privileges.auth && $setup.privileges.userId != $props.comment.user_id ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+  ), $setup.canReply ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
     key: 0,
     onClick: _cache[0] || (_cache[0] = function ($event) {
       return $setup.showForm = !$setup.showForm;
@@ -21784,12 +21788,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "class": "ml-auto text-sm"
   }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(!$setup.showForm ? 'Reply' : 'Hide'), 1
   /* TEXT */
-  )) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])]), $setup.privileges.auth && $setup.privileges.userId != $props.comment.user_id ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_15, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_reply_comment_form, {
+  )) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])]), $setup.canReply ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_15, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_reply_comment_form, {
     "comment-id": $props.comment.id,
-    "user-id": $props.comment.user ? $props.comment.user.id : $setup.privileges.profileId
+    "comment-user-id": $props.comment.user_id
   }, null, 8
   /* PROPS */
-  , ["comment-id", "user-id"]), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $setup.showForm]])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $props.comment.replies.length > 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_comments_list_component, {
+  , ["comment-id", "comment-user-id"]), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $setup.showForm]])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $props.comment.replies.length > 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_comments_list_component, {
     key: 1,
     comments: $props.comment.replies,
     parent: $props.comment,
@@ -21853,10 +21857,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_load_button_component = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("load-button-component");
 
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_comments_list_component, {
-    comments: $setup.commentsList
+    comments: $setup.comments
   }, null, 8
   /* PROPS */
-  , ["comments"]), !$setup.loaded && $setup.listLenght && $setup.listLenght < $props.count ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_load_button_component, {
+  , ["comments"]), $setup.canLoad ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_load_button_component, {
     key: 0,
     onLoad: $setup.load
   })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64
@@ -21881,6 +21885,7 @@ __webpack_require__.r(__webpack_exports__);
 
 function render(_ctx, _cache) {
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+    "class": "border rounded px-1.5 py-0.5 hover:bg-blue-400 hover:text-white",
     type: "button",
     onClick: _cache[0] || (_cache[0] = function ($event) {
       return _ctx.$emit('load');

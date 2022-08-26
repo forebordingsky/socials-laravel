@@ -2,29 +2,32 @@
 import axios from 'axios';
 import { computed, provide, ref } from 'vue';
 
-    const props = defineProps(['comments','count','auth','owned','profileId','userId'])
-    const auth = props.auth
-    const owned = props.owned
-    const userId = props.userId
-    const profileId = props.profileId
-    const commentsList = ref(props.comments)
-    const loaded = ref(false)
-    provide('privileges',{auth, owned, userId, profileId})
+    const props = defineProps(['auth','user'])
+    const comments = ref(props.user.latest_comments)
+    const user = {
+        email: props.user.email,
+        id: props.user.id
+    }
 
-    const listLenght = computed(() => {
-        return commentsList.value.length
+    provide('users',{
+        auth: props.auth,
+        profile: user
     })
+
     //Загружаем все оставшиеся комментарии и скрываем кнопку
     const load = () => {
-        axios.get(`/api/profile/${props.profileId}/comments`)
-            .then(response => commentsList.value = commentsList.value.concat(response.data))
+        axios.get(`/api/profile/${user.id}/comments`)
+            .then(response => comments.value = comments.value.concat(response.data))
             .catch(error => console.log(error));
-        loaded.value = !loaded.value
     }
+
+    const canLoad = computed(() => {
+        return comments.value.length < props.user.profile_comments_count
+    })
 
 </script>
 
 <template>
-    <comments-list-component :comments="commentsList"/>
-    <load-button-component v-if="!loaded && listLenght && listLenght < count" @load="load"/>
+    <comments-list-component :comments="comments"/>
+    <load-button-component v-if="canLoad" @load="load"/>
 </template>

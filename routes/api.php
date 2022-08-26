@@ -19,4 +19,4 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // });
 
-Route::get('profile/{user:id}/comments',[CommentController::class,'getAllCommentsJSON'])->name('api.user.comments');
+Route::get('profile/{user:id}/comments',[CommentController::class,'getRestJSON'])->name('api.user.comments');

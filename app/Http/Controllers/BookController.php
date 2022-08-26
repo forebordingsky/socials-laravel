@@ -99,11 +99,4 @@ class BookController extends Controller
         $book->delete();
         return redirect()->route('user.books',$user->id);
     }
-
-    public function shareLibrary(Request $request, User $user, User $owner)
-    {
-        $owner->sharedUsers()->toggle($user);
-        return redirect()->back();
-    }
-
 }

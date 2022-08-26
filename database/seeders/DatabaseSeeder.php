@@ -38,6 +38,7 @@ class DatabaseSeeder extends Seeder
 
         Comment::create([
             'user_id' => 1,
+            'profile_user_id' => 1,
             'header' => $faker->text(rand(6,20)),
             'description' => $faker->text(rand(20,30)),
 
@@ -45,12 +46,14 @@ class DatabaseSeeder extends Seeder
 
         Comment::create([
             'user_id' => 1,
+            'profile_user_id' => 1,
             'header' => $faker->text(rand(6,20)),
             'description' => $faker->text(rand(20,30)),
         ]);
 
         Comment::create([
             'user_id' => 2,
+            'profile_user_id' => 1,
             'parent_id' => 1,
             'header' => $faker->text(rand(6,20)),
             'description' => $faker->text(rand(20,30)),
@@ -58,12 +61,14 @@ class DatabaseSeeder extends Seeder
 
         Comment::create([
             'user_id' => 2,
+            'profile_user_id' => 2,
             'header' => $faker->text(rand(6,20)),
             'description' => $faker->text(rand(20,30)),
         ]);
 
         Comment::create([
             'user_id' => 3,
+            'profile_user_id' => 3,
             'header' => $faker->text(rand(6,20)),
             'description' => $faker->text(rand(20,30)),
         ]);

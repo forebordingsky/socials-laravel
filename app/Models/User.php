@@ -17,7 +17,6 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
         'email',
         'password',
     ];
@@ -51,19 +50,25 @@ class User extends Authenticatable
         return $this->hasMany(Comment::class,'user_id');
     }
 
-    public function userComments()
+    public function profileComments()
     {
-        return $this->comments()->where('parent_id',null)->with('user','replies')->orderBy('updated_at','desc');
+        return $this->hasMany(Comment::class,'profile_user_id')->where('parent_id', null)->with('replies')->orderBy('updated_at','desc');
     }
 
     public function latestComments()
     {
-        return $this->userComments()->limit(5);
+        return $this->profileComments()->limit(5);
     }
 
     public function lastComments()
     {
-        return $this->userComments()->skip(5)->limit(PHP_INT_MAX);
+        return $this->profileComments()->skip(5)->limit(PHP_INT_MAX);
+    }
+
+
+    public function userComments()
+    {
+        return $this->comments()->where('parent_id',null)->with('user','replies')->orderBy('updated_at','desc');
     }
 
     public function books()

@@ -1,13 +1,13 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue';
 
-    const props = defineProps(['commentId','userId'])
+    const props = defineProps(['commentId','commentUserId'])
     const csrfToken = ref();
     onMounted(() => {
         csrfToken.value = document.querySelector('meta[name="csrf-token"]').content
     })
     const replyCommentRoute = computed(() => {
-        return '/profile/' + props.userId + '/reply-comment/' + props.commentId
+        return '/profile/' + props.commentUserId + '/reply-comment/' + props.commentId
     })
 
 </script>
